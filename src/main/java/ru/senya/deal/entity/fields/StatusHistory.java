@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString()
 @Table(name = "status_history")
 public class StatusHistory {
 
@@ -28,12 +29,4 @@ public class StatusHistory {
     @Column(name = "change_type")
     private ChangeType changeType;
 
-    @Override
-    public String toString() {
-        return  "{" + '\n'
-                + '"' + "status" + '"' + ':' + '"' + status + '"' + ',' + '\n'
-                + '"' + "time" + '"' + ':' + '"' + time + '"' + ',' + '\n'
-                + '"' + "changeType" + '"' + ':' + '"' + changeType + '"' + '\n' +
-                "}";
-    }
 }

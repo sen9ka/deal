@@ -3,13 +3,8 @@ package ru.senya.deal.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import ru.senya.deal.config.RestTemplateMethods;
 import ru.senya.deal.entity.dto.FinishRegistrationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.dto.ScoringDataDTO;
@@ -21,6 +16,7 @@ import ru.senya.deal.repositories.ApplicationRepository;
 import ru.senya.deal.repositories.ClientRepository;
 import ru.senya.deal.repositories.EmploymentRepository;
 import ru.senya.deal.repositories.PassportRepository;
+import ru.senya.deal.util.ApplicationNotFoundException;
 
 import java.util.Optional;
 
@@ -32,17 +28,24 @@ public class CalculationService {
     private final ClientRepository clientRepository;
     private final PassportRepository passportRepository;
     private final EmploymentRepository employmentRepository;
+    private final RestTemplateMethods restTemplateMethods;
+
+    public void makePostRequest(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId, String calculationsUrl) throws JsonProcessingException {
+        enrichClient(finishRegistrationRequestDTO, applicationId);
+        ScoringDataDTO scoringDataDTO = enrichScoringDataDTO(applicationId);
+
+        restTemplateMethods.createPostRequestToCalculate(scoringDataDTO, calculationsUrl);
+    }
 
     private Application findApplication(Long applicationId) {
         Optional<Application> optionalApplication = applicationRepository.findByApplicationId(applicationId);
 
-        return optionalApplication.orElse(null);
+        return optionalApplication.orElseThrow(ApplicationNotFoundException::new);
     }
 
-    private Client findAndSaveClient(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Application application) {
+    private Client findAndUpdateClient(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Application application) {
         Client client = application.getClientId();
-        Client.ClientBuilder clientBuilder = client.toBuilder();
-        Client updatedClient = clientBuilder
+        Client updatedClient = client.toBuilder()
                 .gender(finishRegistrationRequestDTO.getGender())
                 .maritalStatus(finishRegistrationRequestDTO.getMaritalStatus())
                 .account(finishRegistrationRequestDTO.getAccount())
@@ -54,8 +57,7 @@ public class CalculationService {
 
     private void findAndUpdatePassport(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Client client) {
         Passport passport = client.getPassportId();
-        Passport.PassportBuilder passportBuilder = passport.toBuilder();
-        Passport updatedPassport = passportBuilder
+        Passport updatedPassport = passport.toBuilder()
                 .issueBranch(finishRegistrationRequestDTO.getPassportIssueBranch())
                 .issueDate(finishRegistrationRequestDTO.getPassportIssueDate())
                 .build();
@@ -65,8 +67,7 @@ public class CalculationService {
 
     private void findAndUpdateEmployment(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Client client) {
         Employment employment = client.getEmploymentId();
-        Employment.EmploymentBuilder employmentBuilder = employment.toBuilder();
-        Employment updatedEmployment = employmentBuilder
+        Employment updatedEmployment = employment.toBuilder()
                 .status(finishRegistrationRequestDTO.getEmployment().getStatus())
                 .employerInn(finishRegistrationRequestDTO.getEmployment().getEmployerINN())
                 .salary(finishRegistrationRequestDTO.getEmployment().getSalary())
@@ -81,7 +82,7 @@ public class CalculationService {
     private void enrichClient(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId) {
 
         Application application = findApplication(applicationId);
-        Client client = findAndSaveClient(finishRegistrationRequestDTO, application);
+        Client client = findAndUpdateClient(finishRegistrationRequestDTO, application);
         findAndUpdatePassport(finishRegistrationRequestDTO, client);
         findAndUpdateEmployment(finishRegistrationRequestDTO, client);
 
@@ -113,19 +114,5 @@ public class CalculationService {
                 .isInsuranceEnabled(loanOfferDTO.getIsInsuranceEnabled())
                 .isSalaryClient(loanOfferDTO.getIsSalaryClient())
                 .build();
-
     }
-
-    public void makePostRequest(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId, String calculationsUrl) throws JsonProcessingException {
-        enrichClient(finishRegistrationRequestDTO, applicationId);
-        ScoringDataDTO scoringDataDTO = enrichScoringDataDTO(applicationId);
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<ScoringDataDTO> request = new HttpEntity<>(scoringDataDTO, headers);
-        restTemplate.exchange(calculationsUrl, HttpMethod.POST, request, new ParameterizedTypeReference<>() {});
-    }
-
 }

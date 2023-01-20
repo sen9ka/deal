@@ -3,7 +3,7 @@ package ru.senya.deal.entity.models;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.senya.deal.entity.enums.ApplicationStatus;
-
+import javax.json.bind.annotation.JsonbProperty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -29,6 +29,7 @@ public class Application {
     private Long creditId;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
     @Column(name = "creation_date")
@@ -44,7 +45,7 @@ public class Application {
     private Integer sesCode;
 
     @Column(name = "status_history", columnDefinition = "jsonb")
+    @JsonbProperty
     private String statusHistory;
-
 
 }

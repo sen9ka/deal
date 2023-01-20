@@ -35,7 +35,7 @@ public class DealController {
 
     @PostMapping("/application")
     @Operation(summary = "Прескоринг - 4 кредитных предложения - на основании LoanApplicationRequestDTO")
-    public ResponseEntity<?> getLoanOffers(@RequestBody LoanApplicationRequestDTO loanApplicationRequestDTO) {
+    public ResponseEntity<?> getLoanOffers(@RequestBody LoanApplicationRequestDTO loanApplicationRequestDTO) throws JsonProcessingException {
         List<LoanOfferDTO> loanOfferDTOList = applicationService.makePostRequest(loanApplicationRequestDTO, applicationsUrl);
         return new ResponseEntity<>(loanOfferDTOList, HttpStatus.OK);
     }
