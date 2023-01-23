@@ -1,10 +1,11 @@
-package ru.senya.deal.config;
+package ru.senya.deal.clients;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+import ru.senya.deal.config.RestTemplateConfig;
 import ru.senya.deal.entity.dto.LoanApplicationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.dto.ScoringDataDTO;

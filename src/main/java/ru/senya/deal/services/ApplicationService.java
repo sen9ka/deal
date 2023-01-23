@@ -6,7 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.senya.deal.config.ConveyorClient;
+import ru.senya.deal.clients.ConveyorClient;
 import ru.senya.deal.entity.dto.LoanApplicationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.enums.ApplicationStatus;
@@ -34,7 +34,7 @@ public class ApplicationService {
     private final ConveyorClient conveyorClient;
 
     @Transactional
-    public List<LoanOfferDTO> makePostRequest(LoanApplicationRequestDTO loanApplicationRequestDTO, String applicationsUrl) throws StatusHistoryProcessingException {
+    public List<LoanOfferDTO> makePostRequest(LoanApplicationRequestDTO loanApplicationRequestDTO, String applicationsUrl) {
 
         Client createdClient = createAndSaveClient(loanApplicationRequestDTO);
         Application createdApplication = createAndSaveApplication(createdClient);
@@ -64,7 +64,7 @@ public class ApplicationService {
         return client;
     }
 
-    private Application createAndSaveApplication(Client client) throws StatusHistoryProcessingException {
+    private Application createAndSaveApplication(Client client) {
         List<String> statusHistoryList = new ArrayList<>();
         StatusHistory firstStatus = StatusHistory.builder()
                 .status("CREATED")

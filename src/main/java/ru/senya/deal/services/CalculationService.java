@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.senya.deal.config.ConveyorClient;
+import ru.senya.deal.clients.ConveyorClient;
 import ru.senya.deal.controllers.exceptionHandler.exceptions.LoanOfferProcessingException;
 import ru.senya.deal.entity.dto.FinishRegistrationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
@@ -31,7 +31,7 @@ public class CalculationService {
     private final EmploymentRepository employmentRepository;
     private final ConveyorClient conveyorClient;
 
-    public void makePostRequest(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId, String calculationsUrl) throws LoanOfferProcessingException {
+    public void makePostRequest(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId, String calculationsUrl) {
         enrichClient(finishRegistrationRequestDTO, applicationId);
         ScoringDataDTO scoringDataDTO = enrichScoringDataDTO(applicationId);
 
@@ -89,7 +89,7 @@ public class CalculationService {
 
     }
 
-    private ScoringDataDTO enrichScoringDataDTO(Long applicationId) throws LoanOfferProcessingException {
+    private ScoringDataDTO enrichScoringDataDTO(Long applicationId)  {
 
         ObjectMapper mapper = new ObjectMapper();
 

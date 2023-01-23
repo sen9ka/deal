@@ -1,8 +1,6 @@
 package ru.senya.deal.controllers.exceptionHandler.exceptions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-public class LoanOfferProcessingException extends JsonProcessingException {
+public class LoanOfferProcessingException extends RuntimeException {
     public LoanOfferProcessingException(String msg) {
         super(msg);
     }

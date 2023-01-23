@@ -41,7 +41,7 @@ public class DealController {
 
     @PostMapping("/application")
     @Operation(summary = "Прескоринг - 4 кредитных предложения - на основании LoanApplicationRequestDTO")
-    public ResponseEntity<?> getLoanOffers(@RequestBody LoanApplicationRequestDTO loanApplicationRequestDTO) throws StatusHistoryProcessingException {
+    public ResponseEntity<?> getLoanOffers(@RequestBody LoanApplicationRequestDTO loanApplicationRequestDTO) {
         logger.trace("Application API accessed");
         List<LoanOfferDTO> loanOfferDTOList = applicationService.makePostRequest(loanApplicationRequestDTO, applicationsUrl);
         return new ResponseEntity<>(loanOfferDTOList, HttpStatus.OK);
@@ -49,7 +49,7 @@ public class DealController {
 
     @PostMapping("/offer")
     @Operation(summary = "Обновление статуса заявки и истории заказов, установка applied Offer")
-    public ResponseEntity<?> chooseLoanOffer(@RequestBody LoanOfferDTO loanOfferDTO) throws StatusHistoryProcessingException, LoanOfferProcessingException {
+    public ResponseEntity<?> chooseLoanOffer(@RequestBody LoanOfferDTO loanOfferDTO) {
         logger.trace("Offer API accessed");
         offerService.enrichApplication(loanOfferDTO);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -57,7 +57,7 @@ public class DealController {
 
     @PostMapping("/calculate/{applicationId}")
     @Operation(summary = "Скоринг данных, высчитывание ставки(rate), полной стоимости кредита(psk), размера ежемесячного платежа(monthlyPayment), графика ежемесячных платежей")
-    public ResponseEntity<?> enrichScoringDataDTO(@RequestBody FinishRegistrationRequestDTO finishRegistrationRequestDTO, @PathVariable Long applicationId) throws LoanOfferProcessingException {
+    public ResponseEntity<?> enrichScoringDataDTO(@RequestBody FinishRegistrationRequestDTO finishRegistrationRequestDTO, @PathVariable Long applicationId) {
         logger.trace("Calculation API accessed");
         calculationService.makePostRequest(finishRegistrationRequestDTO, applicationId, calculationsUrl);
         return new ResponseEntity<>(HttpStatus.OK);

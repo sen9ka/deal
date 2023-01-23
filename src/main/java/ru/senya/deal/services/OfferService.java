@@ -25,7 +25,7 @@ public class OfferService {
 
     private final ApplicationRepository applicationRepository;
 
-    public void enrichApplication(LoanOfferDTO loanOfferDTO) throws StatusHistoryProcessingException, LoanOfferProcessingException {
+    public void enrichApplication(LoanOfferDTO loanOfferDTO) {
         Optional<Application> optionalApplication = applicationRepository.findByApplicationId(loanOfferDTO.getApplicationId());
         
         Application application = optionalApplication.orElseThrow(() -> new ApplicationNotFoundException("Заявка с ID" + loanOfferDTO.getApplicationId() + "не найдена"));
