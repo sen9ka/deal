@@ -54,5 +54,4 @@ public class LoanApplicationRequestDTO {
     @Schema(description = "Номер паспорта")
     private String passportNumber;
 
-
 }

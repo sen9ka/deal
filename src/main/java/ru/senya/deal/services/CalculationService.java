@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.senya.deal.config.RestTemplateMethods;
+import ru.senya.deal.config.ConveyorClient;
+import ru.senya.deal.controllers.exceptionHandler.exceptions.LoanOfferProcessingException;
 import ru.senya.deal.entity.dto.FinishRegistrationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.dto.ScoringDataDTO;
@@ -16,7 +17,7 @@ import ru.senya.deal.repositories.ApplicationRepository;
 import ru.senya.deal.repositories.ClientRepository;
 import ru.senya.deal.repositories.EmploymentRepository;
 import ru.senya.deal.repositories.PassportRepository;
-import ru.senya.deal.util.ApplicationNotFoundException;
+import ru.senya.deal.controllers.exceptionHandler.exceptions.ApplicationNotFoundException;
 
 import java.util.Optional;
 
@@ -28,19 +29,19 @@ public class CalculationService {
     private final ClientRepository clientRepository;
     private final PassportRepository passportRepository;
     private final EmploymentRepository employmentRepository;
-    private final RestTemplateMethods restTemplateMethods;
+    private final ConveyorClient conveyorClient;
 
-    public void makePostRequest(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId, String calculationsUrl) throws JsonProcessingException {
+    public void makePostRequest(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId, String calculationsUrl) throws LoanOfferProcessingException {
         enrichClient(finishRegistrationRequestDTO, applicationId);
         ScoringDataDTO scoringDataDTO = enrichScoringDataDTO(applicationId);
 
-        restTemplateMethods.createPostRequestToCalculate(scoringDataDTO, calculationsUrl);
+        conveyorClient.sendScoringDataDTO(scoringDataDTO, calculationsUrl);
     }
 
     private Application findApplication(Long applicationId) {
         Optional<Application> optionalApplication = applicationRepository.findByApplicationId(applicationId);
 
-        return optionalApplication.orElseThrow(ApplicationNotFoundException::new);
+        return optionalApplication.orElseThrow(() -> new ApplicationNotFoundException("Заявка с ID " + applicationId + " не найдена"));
     }
 
     private Client findAndUpdateClient(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Application application) {
@@ -88,12 +89,17 @@ public class CalculationService {
 
     }
 
-    private ScoringDataDTO enrichScoringDataDTO(Long applicationId) throws JsonProcessingException {
+    private ScoringDataDTO enrichScoringDataDTO(Long applicationId) throws LoanOfferProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
 
         Application application = findApplication(applicationId);
-        LoanOfferDTO loanOfferDTO = mapper.readValue(application.getAppliedOffer(), LoanOfferDTO.class);
+        LoanOfferDTO loanOfferDTO = null;
+        try {
+            loanOfferDTO = mapper.readValue(application.getAppliedOffer(), LoanOfferDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new LoanOfferProcessingException("Ошибка при маппинге loanOfferDTO" + "\n" + loanOfferDTO.toString());
+        }
 
         return ScoringDataDTO.builder()
                 .amount(loanOfferDTO.getTotalAmount())

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.senya.deal.config.RestTemplateMethods;
+import ru.senya.deal.config.ConveyorClient;
 import ru.senya.deal.entity.dto.LoanApplicationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.enums.ApplicationStatus;
@@ -18,6 +18,8 @@ import ru.senya.deal.entity.models.Application;
 import ru.senya.deal.entity.models.Client;
 import ru.senya.deal.repositories.ApplicationRepository;
 import ru.senya.deal.repositories.ClientRepository;
+import ru.senya.deal.controllers.exceptionHandler.exceptions.StatusHistoryProcessingException;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,14 +31,14 @@ public class ApplicationService {
 
     private final ClientRepository clientRepository;
     private final ApplicationRepository applicationRepository;
-    private final RestTemplateMethods restTemplateMethods;
+    private final ConveyorClient conveyorClient;
 
     @Transactional
-    public List<LoanOfferDTO> makePostRequest(LoanApplicationRequestDTO loanApplicationRequestDTO, String applicationsUrl) throws JsonProcessingException {
+    public List<LoanOfferDTO> makePostRequest(LoanApplicationRequestDTO loanApplicationRequestDTO, String applicationsUrl) throws StatusHistoryProcessingException {
 
         Client createdClient = createAndSaveClient(loanApplicationRequestDTO);
         Application createdApplication = createAndSaveApplication(createdClient);
-        List<LoanOfferDTO> loanOfferDTOList = restTemplateMethods.createPostRequestToApplication(loanApplicationRequestDTO, applicationsUrl, createdApplication);
+        List<LoanOfferDTO> loanOfferDTOList = conveyorClient.getLoanOffers(loanApplicationRequestDTO, applicationsUrl);
         enrichLoanOffers(loanOfferDTOList, createdApplication);
         return loanOfferDTOList;
 
@@ -62,7 +64,7 @@ public class ApplicationService {
         return client;
     }
 
-    private Application createAndSaveApplication(Client client) throws JsonProcessingException {
+    private Application createAndSaveApplication(Client client) throws StatusHistoryProcessingException {
         List<String> statusHistoryList = new ArrayList<>();
         StatusHistory firstStatus = StatusHistory.builder()
                 .status("CREATED")
@@ -70,9 +72,14 @@ public class ApplicationService {
                 .changeType(ChangeType.AUTOMATIC)
                 .build();
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        statusHistoryList.add(mapper.writeValueAsString(firstStatus));
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            statusHistoryList.add(mapper.writeValueAsString(firstStatus));
+        } catch (JsonProcessingException e) {
+            throw new StatusHistoryProcessingException("Ошибка при маппинге поля StatusHistory");
+        }
+
 
         Application application = Application.builder()
                 .clientId(client)

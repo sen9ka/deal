@@ -8,17 +8,16 @@ import org.springframework.web.client.RestTemplate;
 import ru.senya.deal.entity.dto.LoanApplicationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.dto.ScoringDataDTO;
-import ru.senya.deal.entity.models.Application;
 
 import java.util.List;
 
 @AllArgsConstructor
 @Configuration
-public class RestTemplateMethods {
+public class ConveyorClient {
 
     RestTemplateConfig restTemplateConfig;
 
-    public List<LoanOfferDTO> createPostRequestToApplication(LoanApplicationRequestDTO loanApplicationRequestDTO, String applicationsUrl, Application createdApplication) {
+    public List<LoanOfferDTO> getLoanOffers(LoanApplicationRequestDTO loanApplicationRequestDTO, String applicationsUrl) {
         RestTemplate restTemplate = restTemplateConfig.getRestTemplate();
         HttpHeaders headers = restTemplateConfig.getHeaders();
 
@@ -28,7 +27,7 @@ public class RestTemplateMethods {
         return responseEntity.getBody();
     }
 
-    public void createPostRequestToCalculate(ScoringDataDTO scoringDataDTO, String calculationsUrl) {
+    public void sendScoringDataDTO(ScoringDataDTO scoringDataDTO, String calculationsUrl) {
         RestTemplate restTemplate = restTemplateConfig.getRestTemplate();
         HttpHeaders headers = restTemplateConfig.getHeaders();
 
