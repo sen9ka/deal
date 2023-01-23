@@ -12,13 +12,11 @@ import ru.senya.deal.controllers.exceptionHandler.exceptions.StatusHistoryProces
 @ControllerAdvice
 public class ApplicationExceptionHandler {
 
-    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Заявка не найдена")
     @ExceptionHandler(ApplicationNotFoundException.class)
     public ResponseEntity<?> handleApplicationNotFoundException(ApplicationNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-//    @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Ошибка в маппинге")
     @ExceptionHandler(LoanOfferProcessingException.class)
     public ResponseEntity<?> handleLoanOfferProcessingException(LoanOfferProcessingException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
