@@ -3,9 +3,7 @@ package ru.senya.deal.entity.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.NumberFormat;
 import ru.senya.deal.entity.enums.EmploymentPosition;
 import ru.senya.deal.entity.enums.EmploymentStatus;
@@ -13,6 +11,8 @@ import ru.senya.deal.entity.enums.EmploymentStatus;
 import java.math.BigDecimal;
 
 @Getter @Setter @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class EmploymentDTO {
 
     @NotEmpty

@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/deal")
-@Tag(name = "икросервис Сделка (deal)")
+@Tag(name = "микросервис Сделка (deal)")
 public class DealController {
 
     @Value("${applicationLink}")

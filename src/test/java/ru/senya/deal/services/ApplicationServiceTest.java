@@ -1,29 +1,32 @@
 package ru.senya.deal.services;
 
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import ru.senya.deal.entity.dto.LoanApplicationRequestDTO;
-import ru.senya.deal.entity.dto.LoanOfferDTO;
+import org.mockito.junit.jupiter.MockitoExtension;
+import ru.senya.deal.clients.ConveyorClient;
 import ru.senya.deal.repositories.ApplicationRepository;
 import ru.senya.deal.repositories.ClientRepository;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
-
+@ExtendWith(MockitoExtension.class)
 class ApplicationServiceTest {
+
+    @Mock
+    private ClientRepository clientRepository;
+
+    @Mock
+    private ApplicationRepository applicationRepository;
+
+    @Mock
+    private ConveyorClient conveyorClient;
+
+    @InjectMocks
+    private ApplicationService applicationService;
 
     @Test
     void makePostRequest() {
 
     }
+
 }
