@@ -3,45 +3,40 @@ package ru.senya.deal.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.senya.deal.clients.ConveyorClient;
 import ru.senya.deal.controllers.exceptionHandler.exceptions.LoanOfferProcessingException;
-import ru.senya.deal.entity.dto.FinishRegistrationRequestDTO;
-import ru.senya.deal.entity.dto.LoanOfferDTO;
-import ru.senya.deal.entity.dto.ScoringDataDTO;
+import ru.senya.deal.entity.dto.*;
 import ru.senya.deal.entity.fields.Employment;
 import ru.senya.deal.entity.fields.Passport;
 import ru.senya.deal.entity.models.Application;
 import ru.senya.deal.entity.models.Client;
+import ru.senya.deal.entity.models.Credit;
 import ru.senya.deal.repositories.ApplicationRepository;
 import ru.senya.deal.repositories.ClientRepository;
 import ru.senya.deal.repositories.EmploymentRepository;
 import ru.senya.deal.repositories.PassportRepository;
-import ru.senya.deal.controllers.exceptionHandler.exceptions.ApplicationNotFoundException;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CalculationService {
 
-    private final ApplicationRepository applicationRepository;
+    private final ApplicationService applicationService;
     private final ClientRepository clientRepository;
     private final PassportRepository passportRepository;
     private final EmploymentRepository employmentRepository;
     private final ConveyorClient conveyorClient;
 
-    public void makePostRequest(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId, String calculationsUrl) {
-        enrichClient(finishRegistrationRequestDTO, applicationId);
-        ScoringDataDTO scoringDataDTO = enrichScoringDataDTO(applicationId);
+    public CreditDTO makePostRequest(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId, String calculationsUrl) {
+        ScoringDataDTO scoringDataDTO = createScoringDataDTO(finishRegistrationRequestDTO, applicationId);
 
-        conveyorClient.sendScoringDataDTO(scoringDataDTO, calculationsUrl);
+        return conveyorClient.sendScoringDataDTO(scoringDataDTO, calculationsUrl);
     }
 
-    private Application findApplication(Long applicationId) {
-        Optional<Application> optionalApplication = applicationRepository.findByApplicationId(applicationId);
-
-        return optionalApplication.orElseThrow(() -> new ApplicationNotFoundException("Заявка с ID " + applicationId + " не найдена"));
+    private ScoringDataDTO createScoringDataDTO(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId) {
+        enrichClient(finishRegistrationRequestDTO, applicationId);
+        return enrichScoringDataDTO(applicationId);
     }
 
     private Client findAndUpdateClient(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Application application) {
@@ -70,7 +65,7 @@ public class CalculationService {
         Employment employment = client.getEmploymentId();
         Employment updatedEmployment = employment.toBuilder()
                 .status(finishRegistrationRequestDTO.getEmployment().getStatus())
-                .employerInn(finishRegistrationRequestDTO.getEmployment().getEmployerINN())
+                .employerINN(finishRegistrationRequestDTO.getEmployment().getEmployerINN())
                 .salary(finishRegistrationRequestDTO.getEmployment().getSalary())
                 .position(finishRegistrationRequestDTO.getEmployment().getPosition())
                 .workExperienceTotal(finishRegistrationRequestDTO.getEmployment().getWorkExperienceTotal())
@@ -82,23 +77,28 @@ public class CalculationService {
 
     private void enrichClient(FinishRegistrationRequestDTO finishRegistrationRequestDTO, Long applicationId) {
 
-        Application application = findApplication(applicationId);
+        Application application = applicationService.findApplication(applicationId);
         Client client = findAndUpdateClient(finishRegistrationRequestDTO, application);
         findAndUpdatePassport(finishRegistrationRequestDTO, client);
         findAndUpdateEmployment(finishRegistrationRequestDTO, client);
 
     }
 
+    private EmploymentDTO convertToEmploymentDTO(Employment employment) {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(employment, EmploymentDTO.class);
+    }
+
     private ScoringDataDTO enrichScoringDataDTO(Long applicationId)  {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        Application application = findApplication(applicationId);
+        Application application = applicationService.findApplication(applicationId);
         LoanOfferDTO loanOfferDTO = null;
         try {
             loanOfferDTO = mapper.readValue(application.getAppliedOffer(), LoanOfferDTO.class);
         } catch (JsonProcessingException e) {
-            throw new LoanOfferProcessingException("Ошибка при маппинге loanOfferDTO" + "\n" + loanOfferDTO.toString());
+            throw new LoanOfferProcessingException("Ошибка при маппинге loanOfferDTO");
         }
 
         return ScoringDataDTO.builder()
@@ -115,7 +115,7 @@ public class CalculationService {
                 .passportIssueBranch(application.getClientId().getPassportId().getIssueBranch())
                 .maritalStatus(application.getClientId().getMaritalStatus())
                 .dependentAmount(application.getClientId().getDependentAmount())
-                .employment(application.getClientId().getEmploymentId())
+                .employment(convertToEmploymentDTO(application.getClientId().getEmploymentId()))
                 .account(application.getClientId().getAccount())
                 .isInsuranceEnabled(loanOfferDTO.getIsInsuranceEnabled())
                 .isSalaryClient(loanOfferDTO.getIsSalaryClient())

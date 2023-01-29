@@ -1,5 +1,7 @@
 package ru.senya.deal.entity.fields;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.senya.deal.entity.enums.EmploymentPosition;
@@ -19,18 +21,21 @@ public class Employment {
     @Id
     @Column(name = "employment_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Integer employmentId;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private EmploymentStatus status;
 
     @Column(name = "employer_inn")
-    private String employerInn;
+    private String employerINN;
 
     @Column(name = "salary")
     private BigDecimal salary;
 
     @Column(name = "position")
+    @Enumerated(EnumType.STRING)
     private EmploymentPosition position;
 
     @Column(name = "work_experience_total")

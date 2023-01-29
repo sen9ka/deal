@@ -78,7 +78,7 @@ public class ScoringDataDTO {
 
     @NotEmpty
     @Schema(description = "Информация о работе")
-    private Employment employment;
+    private EmploymentDTO employment;
 
     @NotEmpty
     @Schema(description = "Информация о работе")

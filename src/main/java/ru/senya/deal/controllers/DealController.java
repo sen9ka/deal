@@ -12,9 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.deal.controllers.exceptionHandler.exceptions.LoanOfferProcessingException;
 import ru.senya.deal.controllers.exceptionHandler.exceptions.StatusHistoryProcessingException;
+import ru.senya.deal.entity.dto.CreditDTO;
 import ru.senya.deal.entity.dto.FinishRegistrationRequestDTO;
 import ru.senya.deal.entity.dto.LoanApplicationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
+import ru.senya.deal.entity.models.Application;
+import ru.senya.deal.entity.models.Credit;
 import ru.senya.deal.services.ApplicationService;
 import ru.senya.deal.services.CalculationService;
 import ru.senya.deal.services.OfferService;
@@ -51,16 +54,16 @@ public class DealController {
     @Operation(summary = "Обновление статуса заявки и истории заказов, установка applied Offer")
     public ResponseEntity<?> chooseLoanOffer(@RequestBody LoanOfferDTO loanOfferDTO) {
         logger.trace("Offer API accessed");
-        offerService.enrichApplication(loanOfferDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Application application = offerService.enrichApplication(loanOfferDTO);
+        return new ResponseEntity<>(application, HttpStatus.OK);
     }
 
     @PostMapping("/calculate/{applicationId}")
     @Operation(summary = "Скоринг данных, высчитывание ставки(rate), полной стоимости кредита(psk), размера ежемесячного платежа(monthlyPayment), графика ежемесячных платежей")
     public ResponseEntity<?> enrichScoringDataDTO(@RequestBody FinishRegistrationRequestDTO finishRegistrationRequestDTO, @PathVariable Long applicationId) {
         logger.trace("Calculation API accessed");
-        calculationService.makePostRequest(finishRegistrationRequestDTO, applicationId, calculationsUrl);
-        return new ResponseEntity<>(HttpStatus.OK);
+        CreditDTO creditDTO = calculationService.makePostRequest(finishRegistrationRequestDTO, applicationId, calculationsUrl);
+        return new ResponseEntity<>(creditDTO, HttpStatus.OK);
     }
 
 }

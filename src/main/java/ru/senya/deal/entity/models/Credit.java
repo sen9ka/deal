@@ -39,6 +39,6 @@ public class Credit {
     private Boolean salaryClient;
 
     @Column(name = "credit_status")
-    private CreditStatus creditStatus;
+    private String creditStatus;
 
 }
