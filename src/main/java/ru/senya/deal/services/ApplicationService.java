@@ -34,7 +34,7 @@ public class ApplicationService {
     private final ClientRepository clientRepository;
     private final ApplicationRepository applicationRepository;
     private final ConveyorClient conveyorClient;
-    
+
     @Transactional
     public List<LoanOfferDTO> makePostRequest(LoanApplicationRequestDTO loanApplicationRequestDTO, String applicationsUrl) {
 
