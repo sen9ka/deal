@@ -42,32 +42,16 @@ class ApplicationServiceTest {
     private ApplicationService applicationService;
 
     @Test
-    void MakePostRequest() {
-        LoanApplicationRequestDTO loanApplicationRequestDTO = LoanApplicationRequestDTO.builder()
-                .amount(BigDecimal.valueOf(100000))
-                .term(12)
-                .firstName("name")
-                .lastName("name")
-                .middleName("name")
-                .email("email@mail.com")
-                .birthdate(LocalDate.of(1999, 3, 22))
-                .passportSeries("124514")
-                .passportNumber("125151")
-                .build();
+    @DisplayName("Сравнить ожидаемый List<LoanOfferDTO> с реальным")
+    void shouldReturnSameListTest() {
+        LoanApplicationRequestDTO loanApplicationRequestDTO = TestData.getTestLoanApplicationRequestDTO();
         Application application = Application.builder().applicationId(1L).build();
-        LoanOfferDTO firstOffer = new LoanOfferDTO();
-        LoanOfferDTO secondOffer = new LoanOfferDTO();
-        LoanOfferDTO thirdOffer = new LoanOfferDTO();
-        LoanOfferDTO fourthOffer = new LoanOfferDTO();
-        List<LoanOfferDTO> expectedList = new ArrayList<>();
-        expectedList.add(firstOffer);
-        expectedList.add(secondOffer);
-        expectedList.add(thirdOffer);
-        expectedList.add(fourthOffer);
+        List<LoanOfferDTO> expectedList = TestData.getTestLoanOfferDTOList();
+
         when(applicationService.makePostRequest(loanApplicationRequestDTO, any())).thenReturn(expectedList);
         when(applicationRepository.save(any())).thenReturn(application);
-        List<LoanOfferDTO> actualList = applicationService.makePostRequest(loanApplicationRequestDTO, any());
-        assertEquals(expectedList, actualList);
+
+        assertEquals(expectedList, applicationService.makePostRequest(loanApplicationRequestDTO, any()));
     }
 
     @Test

@@ -57,35 +57,16 @@ class CalculationServiceTest {
     @Test
     @DisplayName("Не удалось сохранить клиента в базу")
     void saveClientShouldReturnRuntimeExceptionTest() {
-        FinishRegistrationRequestDTO finishRegistrationRequestDTO = FinishRegistrationRequestDTO.builder()
-                .gender(Gender.MALE)
-                .maritalStatus(MaritalStatus.MARRIED)
-                .account("account")
-                .build();
+        FinishRegistrationRequestDTO finishRegistrationRequestDTO = TestData.getTestFinishRegistrationRequestDTO();
         assertThrows(RuntimeException.class, () -> calculationService.makePostRequest(finishRegistrationRequestDTO, APPLICATION_ID, "url"));
     }
 
     @Test
+    @DisplayName("Не удалось спарсить поле LoanOfferDTO")
     void shouldThrowLoanOfferProcessingException() {
-        EmploymentDTO employmentDTO = EmploymentDTO.builder().build();
-        FinishRegistrationRequestDTO finishRegistrationRequestDTO = FinishRegistrationRequestDTO.builder()
-                .employment(employmentDTO)
-                .build();
-        Passport passport = Passport.builder()
-                .passportId(1)
-                .build();
-        Employment employment = Employment.builder()
-                .employmentId(1)
-                .build();
-        Client client = Client.builder()
-                .passportId(passport)
-                .clientId(1L)
-                .employmentId(employment)
-                .build();
-        Application application = Application.builder()
-                .clientId(client)
-                .appliedOffer("WrongList")
-                .build();
+        FinishRegistrationRequestDTO finishRegistrationRequestDTO = TestData.getTestFinishRegistrationRequestDTOWithEmployment();
+        Application application = TestData.getTestApplication();
+
         when(applicationService.findApplication(any())).thenReturn(application);
         assertThrows(LoanOfferProcessingException.class, () -> calculationService.makePostRequest(finishRegistrationRequestDTO, APPLICATION_ID, "url"));
     }
