@@ -12,6 +12,7 @@ import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.enums.ChangeType;
 import ru.senya.deal.entity.fields.StatusHistory;
 import ru.senya.deal.entity.models.Application;
+import ru.senya.deal.entity.models.Credit;
 import ru.senya.deal.repositories.ApplicationRepository;
 import ru.senya.deal.controllers.exceptionHandler.exceptions.ApplicationNotFoundException;
 
@@ -49,7 +50,6 @@ public class OfferService {
         statusHistoryList.add(updatedStatus);
 
         application.setStatusHistory(String.valueOf(statusHistoryList));
-
 
         try {
             application.setAppliedOffer(mapper.writeValueAsString(loanOfferDTO));

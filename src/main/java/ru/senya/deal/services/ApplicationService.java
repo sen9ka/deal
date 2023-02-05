@@ -17,6 +17,7 @@ import ru.senya.deal.entity.fields.Passport;
 import ru.senya.deal.entity.fields.StatusHistory;
 import ru.senya.deal.entity.models.Application;
 import ru.senya.deal.entity.models.Client;
+import ru.senya.deal.entity.models.Credit;
 import ru.senya.deal.repositories.ApplicationRepository;
 import ru.senya.deal.repositories.ClientRepository;
 import ru.senya.deal.controllers.exceptionHandler.exceptions.StatusHistoryProcessingException;
@@ -91,6 +92,7 @@ public class ApplicationService {
 
         Application application = Application.builder()
                 .clientId(client)
+                .creditId(new Credit())
                 .status(ApplicationStatus.PREAPPROVAL)
                 .creationDate(LocalDateTime.now())
                 .appliedOffer("Not Chosen Yet")

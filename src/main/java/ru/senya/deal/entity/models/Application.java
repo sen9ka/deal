@@ -26,7 +26,8 @@ public class Application {
     private Client clientId;
 
     @JoinColumn(name = "credit_id", referencedColumnName = "credit_id")
-    private Long creditId;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Credit creditId;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

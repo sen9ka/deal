@@ -4,13 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import ru.senya.deal.controllers.exceptionHandler.exceptions.ApplicationNotFoundException;
-import ru.senya.deal.controllers.exceptionHandler.exceptions.LoanOfferProcessingException;
-import ru.senya.deal.controllers.exceptionHandler.exceptions.StatusHistoryProcessingException;
+import ru.senya.deal.controllers.exceptionHandler.exceptions.*;
 
 @ControllerAdvice
-public class ApplicationExceptionHandler {
+public class DealExceptionHandler {
 
     @ExceptionHandler(ApplicationNotFoundException.class)
     public ResponseEntity<?> handleApplicationNotFoundException(ApplicationNotFoundException exception) {
@@ -24,6 +21,16 @@ public class ApplicationExceptionHandler {
 
     @ExceptionHandler(StatusHistoryProcessingException.class)
     public ResponseEntity<?> handleStatusHistoryProcessingException(StatusHistoryProcessingException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(EmailMessageProcessingException.class)
+    public ResponseEntity<?> handleEmailMessageProcessingException(EmailMessageProcessingException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(PaymentScheduleProcessingException.class)
+    public ResponseEntity<?> handlePaymentScheduleProcessingException(EmailMessageProcessingException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
     }
 
