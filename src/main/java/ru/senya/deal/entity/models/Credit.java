@@ -1,12 +1,18 @@
 package ru.senya.deal.entity.models;
 
 import jakarta.persistence.*;
+import lombok.*;
 import ru.senya.deal.entity.enums.CreditStatus;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "credit")
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Credit {
 
     @Id
@@ -39,6 +45,6 @@ public class Credit {
     private Boolean salaryClient;
 
     @Column(name = "credit_status")
-    private CreditStatus creditStatus;
+    private String creditStatus;
 
 }

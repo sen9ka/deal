@@ -1,0 +1,67 @@
+package ru.senya.deal.services;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+import ru.senya.deal.controllers.exceptionHandler.exceptions.PaymentScheduleProcessingException;
+import ru.senya.deal.entity.dto.CreditDTO;
+import ru.senya.deal.entity.enums.ApplicationStatus;
+import ru.senya.deal.entity.enums.CreditStatus;
+import ru.senya.deal.entity.models.Application;
+import ru.senya.deal.entity.models.Credit;
+import ru.senya.deal.repositories.CreditRepository;
+
+import java.math.BigDecimal;
+
+@Service
+@RequiredArgsConstructor
+public class CreditService {
+
+    private final CreditRepository creditRepository;
+    private final ApplicationService applicationService;
+    private final KafkaService kafkaService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    public Credit sendDocumentsOrDeniedOffer(CreditDTO creditDTO, Long applicationId) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        Application application = applicationService.findApplication(applicationId);
+
+        String paymentSchedule;
+        try {
+            paymentSchedule = mapper.writeValueAsString(creditDTO.getPaymentSchedule());
+        } catch (JsonProcessingException e) {
+            throw new PaymentScheduleProcessingException("Ошибка при маппинге поля PaymentSchedule");
+        }
+
+        Credit credit = application.getCreditId();
+        Credit updatedCredit = credit.toBuilder()
+                .amount(creditDTO.getAmount())
+                .term(creditDTO.getTerm())
+                .monthlyPayment(creditDTO.getMonthlyPayment())
+                .rate(creditDTO.getRate())
+                .psk(creditDTO.getPsk())
+                .paymentSchedule(paymentSchedule)
+                .insuranceEnable(creditDTO.getIsInsuranceEnabled())
+                .salaryClient(creditDTO.getIsSalaryClient())
+                .creditStatus(String.valueOf(CreditStatus.CALCULATED))
+                .build();
+
+        if (updatedCredit.getRate().equals(BigDecimal.valueOf(-1))) {
+            kafkaTemplate.send("application-denied", kafkaService.sendApplicationDenied(applicationId));
+        } else {
+            saveCredit(updatedCredit);
+            kafkaTemplate.send("create-documents", kafkaService.createDocuments(applicationId));
+        }
+
+        return updatedCredit;
+    }
+
+    private void saveCredit(Credit credit) {
+        creditRepository.save(credit);
+    }
+
+}

@@ -6,9 +6,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import ru.senya.deal.config.RestTemplateConfig;
+import ru.senya.deal.entity.dto.CreditDTO;
 import ru.senya.deal.entity.dto.LoanApplicationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.dto.ScoringDataDTO;
+import ru.senya.deal.entity.models.Credit;
 
 import java.util.List;
 
@@ -28,12 +30,14 @@ public class ConveyorClient {
         return responseEntity.getBody();
     }
 
-    public void sendScoringDataDTO(ScoringDataDTO scoringDataDTO, String calculationsUrl) {
+    public CreditDTO sendScoringDataDTO(ScoringDataDTO scoringDataDTO, String calculationsUrl) {
         RestTemplate restTemplate = restTemplateConfig.getRestTemplate();
         HttpHeaders headers = restTemplateConfig.getHeaders();
 
         HttpEntity<ScoringDataDTO> request = new HttpEntity<>(scoringDataDTO, headers);
-        restTemplate.exchange(calculationsUrl, HttpMethod.POST, request, new ParameterizedTypeReference<>() {});
+        ResponseEntity<CreditDTO> responseEntity = restTemplate.exchange(calculationsUrl, HttpMethod.POST, request, new ParameterizedTypeReference<>() {});
+
+        return responseEntity.getBody();
     }
 
 }

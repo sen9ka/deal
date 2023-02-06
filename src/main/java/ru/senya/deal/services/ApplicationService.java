@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.senya.deal.clients.ConveyorClient;
+import ru.senya.deal.controllers.exceptionHandler.exceptions.ApplicationNotFoundException;
 import ru.senya.deal.entity.dto.LoanApplicationRequestDTO;
 import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.enums.ApplicationStatus;
@@ -16,6 +17,7 @@ import ru.senya.deal.entity.fields.Passport;
 import ru.senya.deal.entity.fields.StatusHistory;
 import ru.senya.deal.entity.models.Application;
 import ru.senya.deal.entity.models.Client;
+import ru.senya.deal.entity.models.Credit;
 import ru.senya.deal.repositories.ApplicationRepository;
 import ru.senya.deal.repositories.ClientRepository;
 import ru.senya.deal.controllers.exceptionHandler.exceptions.StatusHistoryProcessingException;
@@ -24,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +45,12 @@ public class ApplicationService {
         enrichLoanOffers(loanOfferDTOList, createdApplication);
         return loanOfferDTOList;
 
+    }
+
+    public Application findApplication(Long applicationId) {
+        Optional<Application> optionalApplication = applicationRepository.findByApplicationId(applicationId);
+
+        return optionalApplication.orElseThrow(() -> new ApplicationNotFoundException("Заявка с ID " + applicationId + " не найдена"));
     }
 
     private Client createAndSaveClient(LoanApplicationRequestDTO loanApplicationRequestDTO) {
@@ -83,6 +92,7 @@ public class ApplicationService {
 
         Application application = Application.builder()
                 .clientId(client)
+                .creditId(new Credit())
                 .status(ApplicationStatus.PREAPPROVAL)
                 .creationDate(LocalDateTime.now())
                 .appliedOffer("Not Chosen Yet")
@@ -95,6 +105,8 @@ public class ApplicationService {
 
         return application;
     }
+
+
 
     private void enrichLoanOffers(List<LoanOfferDTO> loanOfferDTOList, Application application) {
         loanOfferDTOList.forEach(loanOfferDTO -> loanOfferDTO.setApplicationId(application.getApplicationId()));

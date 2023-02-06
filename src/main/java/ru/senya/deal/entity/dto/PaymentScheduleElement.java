@@ -1,8 +1,14 @@
 package ru.senya.deal.entity.dto;
 
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Getter @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentScheduleElement {
 
     private Integer number;
