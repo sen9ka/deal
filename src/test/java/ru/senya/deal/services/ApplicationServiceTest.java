@@ -13,10 +13,6 @@ import ru.senya.deal.entity.dto.LoanOfferDTO;
 import ru.senya.deal.entity.models.Application;
 import ru.senya.deal.repositories.ApplicationRepository;
 import ru.senya.deal.repositories.ClientRepository;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
