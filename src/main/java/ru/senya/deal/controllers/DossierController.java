@@ -22,14 +22,13 @@ public class DossierController {
     }
 
     @PostMapping("/sign")
-    public ResponseEntity<?> sendSesCode(@PathVariable Long applicationId) {
+    public ResponseEntity<?> signDocuments(@PathVariable Long applicationId) {
         kafkaTemplate.send("send-ses", kafkaService.sendDocuments(applicationId));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/code")
-    public ResponseEntity<?> signDocuments(@PathVariable Long applicationId) {
-//        kafkaTemplate.send("send-ses", kafkaService.sendSes(applicationId));
+    public ResponseEntity<?> sendSesCode(@PathVariable Long applicationId) {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
