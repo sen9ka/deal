@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://192.168.99.100:5432/deal
+    username: postgres
+    password: postgres
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+    hibernate:
+      ddl-auto: validate
+  kafka:
+    bootstrap-servers: 192.168.99.100:29092
+springdoc:
+  swagger-ui:
+    path: /deal/swagger-ui.html
+  api-docs:
+    path: /deal/api-docs
+server:
+  port: 8090
+  error:
+    include-message: always
+applicationLink: http://192.168.99.100:8080/conveyor/offers
+calculationLink: http://192.168.99.100:8080/conveyor/calculation
+logging:
+  level:
+    root: INFO
+    ru.senya.deal: TRACE

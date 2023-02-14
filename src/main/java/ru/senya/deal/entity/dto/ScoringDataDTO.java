@@ -10,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 import ru.senya.deal.entity.enums.Gender;
 import ru.senya.deal.entity.enums.MaritalStatus;
-import ru.senya.deal.entity.fields.Employment;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
