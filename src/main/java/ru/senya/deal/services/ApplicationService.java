@@ -47,6 +47,10 @@ public class ApplicationService {
 
     }
 
+    public List<Application> findAll() {
+        return applicationRepository.findAll();
+    }
+
     public Application findApplication(Long applicationId) {
         Optional<Application> optionalApplication = applicationRepository.findByApplicationId(applicationId);
 

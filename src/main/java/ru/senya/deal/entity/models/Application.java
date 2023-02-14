@@ -3,7 +3,6 @@ package ru.senya.deal.entity.models;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.senya.deal.entity.enums.ApplicationStatus;
-import javax.json.bind.annotation.JsonbProperty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -36,7 +35,7 @@ public class Application {
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
-    @Column(name = "applied_offer")
+    @Column(name = "applied_offer", columnDefinition = "VARCHAR(10485760)")
     private String appliedOffer;
 
     @Column(name = "sign_date")
@@ -45,8 +44,7 @@ public class Application {
     @Column(name = "ses_code")
     private Integer sesCode;
 
-    @Column(name = "status_history", columnDefinition = "jsonb")
-    @JsonbProperty
+    @Column(name = "status_history", columnDefinition = "VARCHAR(10485760)")
     private String statusHistory;
 
 }
