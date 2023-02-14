@@ -20,12 +20,14 @@ public class AdminController {
     private final ApplicationService applicationService;
 
     @GetMapping("application")
-    public ResponseEntity<?> findAllApplications() {
+    @Operation(summary = "Вывести все заявки")
+    public ResponseEntity<Object> findAllApplications() {
         return new ResponseEntity<>(applicationService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("application/{applicationId}")
-    public ResponseEntity<?> showApplication(@PathVariable Long applicationId) {
+    @Operation(summary = "Вывести заявку по ID")
+    public ResponseEntity<Object> showApplication(@PathVariable Long applicationId) {
         return new ResponseEntity<>(applicationService.findApplication(applicationId), HttpStatus.OK);
     }
 

@@ -2,7 +2,6 @@ package ru.senya.deal.entity.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.senya.deal.entity.enums.CreditStatus;
 
 import java.math.BigDecimal;
 
@@ -35,7 +34,7 @@ public class Credit {
     @Column(name = "psk")
     private BigDecimal psk;
 
-    @Column(name = "payment_schedule")
+    @Column(name = "payment_schedule", columnDefinition = "VARCHAR(10485760)")
     private String paymentSchedule;
 
     @Column(name = "insurance_enable")
@@ -44,7 +43,7 @@ public class Credit {
     @Column(name = "salary_client")
     private Boolean salaryClient;
 
-    @Column(name = "credit_status")
+    @Column(name = "credit_status", columnDefinition = "VARCHAR(10485760)")
     private String creditStatus;
 
 }

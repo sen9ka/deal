@@ -10,11 +10,11 @@
 	</parent>
 	<groupId>ru.senya</groupId>
 	<artifactId>deal</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1</version>
 	<name>deal</name>
 	<description>MVP2</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
